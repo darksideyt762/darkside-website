@@ -1,15 +1,9 @@
-<script>
-    const password = prompt("Enter Admin Password:");
-    if (password !== "bambukeu") {
-        window.location = "/";
-    }
-</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DARKSIDE Admin Panel</title>
+    <title>DARKSIDE Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -17,7 +11,7 @@
             background: #0a0a1a;
             color: white;
             padding: 20px;
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
         }
         h1 {
@@ -34,7 +28,7 @@
             color: #00ffff;
             font-weight: bold;
         }
-        input {
+        input, textarea {
             width: 100%;
             padding: 12px;
             background: rgba(30, 30, 60, 0.7);
@@ -42,6 +36,7 @@
             color: white;
             border-radius: 8px;
             font-size: 16px;
+            margin-bottom: 10px;
         }
         button {
             background: linear-gradient(45deg, #6a00ff, #ff00aa);
@@ -53,94 +48,103 @@
             font-weight: bold;
             font-size: 16px;
             display: block;
-            margin: 30px auto;
-            width: 80%;
+            margin: 20px auto;
             transition: all 0.3s;
         }
         button:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(106, 0, 255, 0.6);
         }
-        button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        #status {
-            text-align: center;
+        #output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #6a00ff;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
             margin-top: 20px;
-            min-height: 24px;
+            position: relative;
+        }
+        #copyBtn {
+            background: rgba(106, 0, 255, 0.3);
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            font-size: 12px;
         }
         .success {
             color: #00ff88;
-        }
-        .error {
-            color: #ff5555;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h1><i class="fas fa-lock"></i> DARKSIDE Admin</h1>
+    <h1><i class="fas fa-code"></i> DARKSIDE HTML Generator</h1>
     
     <div class="form-group">
-        <label for="appName"><i class="fas fa-mobile-alt"></i> App Name:</label>
-        <input type="text" id="appName" placeholder="e.g. PUBG Mobile" required>
+        <label for="appName"><i class="fas fa-tag"></i> App Name:</label>
+        <input type="text" id="appName" placeholder="e.g. PUBG Mobile">
     </div>
     
     <div class="form-group">
         <label for="appVersion"><i class="fas fa-code-branch"></i> Version:</label>
-        <input type="text" id="appVersion" placeholder="e.g. 3.9.3" required>
+        <input type="text" id="appVersion" placeholder="e.g. 3.9.3">
     </div>
     
     <div class="form-group">
         <label for="downloadLink"><i class="fas fa-link"></i> Download Link:</label>
-        <input type="url" id="downloadLink" placeholder="https://example.com/file.apk" required>
+        <input type="url" id="downloadLink" placeholder="https://example.com/file.apk">
     </div>
     
-    <button id="addBtn">
-        <i class="fas fa-plus-circle"></i> Add Download
-    </button>
+    <button id="generateBtn"><i class="fas fa-magic"></i> Generate HTML</button>
     
-    <div id="status"></div>
+    <div id="output" style="display: none;">
+        <button id="copyBtn"><i class="far fa-copy"></i> Copy</button>
+        <div id="codeContent"></div>
+    </div>
+    
+    <div id="successMessage" class="success">
+        <i class="fas fa-check-circle"></i> Copied to clipboard!
+    </div>
 
     <script>
-        document.getElementById('addBtn').addEventListener('click', async () => {
-          const btn = document.getElementById('addBtn');
-          btn.disabled = true;
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-        
-          try {
-            const response = await fetch('/netlify/functions/update-downloads', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                appName: document.getElementById('appName').value,
-                appVersion: document.getElementById('appVersion').value,
-                downloadLink: document.getElementById('downloadLink').value
-              })
-            });
-        
-            const result = await response.json(); // This will now work!
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const appName = document.getElementById('appName').value.trim();
+            const appVersion = document.getElementById('appVersion').value.trim();
+            const downloadLink = document.getElementById('downloadLink').value.trim();
             
-            if (response.ok) {
-              alert('Success! Site will update shortly.');
-              location.reload();
-            } else {
-              throw new Error(result.error || 'Unknown error');
+            if (!appName || !appVersion || !downloadLink) {
+                alert("Please fill all fields!");
+                return;
             }
-          } catch (error) {
-            alert('Error: ' + error.message);
-            console.error('Details:', error);
-          } finally {
-            btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Download';
-            btn.disabled = false;
-          }
+            
+            // Generate HTML snippet
+            const htmlCode = `
+<div class="update-item">
+    <h3>${appName}</h3>
+    <p>Version: ${appVersion}</p>
+    <a href="${downloadLink}" class="download-btn">
+        <i class="fas fa-download"></i> Download
+    </a>
+</div>`;
+            
+            // Display in output box
+            document.getElementById('codeContent').textContent = htmlCode;
+            document.getElementById('output').style.display = 'block';
         });
-
-        function showStatus(message, type) {
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = message;
-            statusEl.className = type; // 'success' or 'error'
-        }
+        
+        // Copy to clipboard
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            const code = document.getElementById('codeContent').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const msg = document.getElementById('successMessage');
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 2000);
+            });
+        });
     </script>
 </body>
 </html>
