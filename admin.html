@@ -9,7 +9,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DARKSIDE Admin</title>
+    <title>DARKSIDE Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -23,110 +23,135 @@
         h1 {
             color: #6a00ff;
             text-align: center;
+            margin-bottom: 30px;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: #00ffff;
+            font-weight: bold;
         }
-        input, textarea {
+        input {
             width: 100%;
-            padding: 10px;
-            background: rgba(30, 30, 60, 0.5);
+            padding: 12px;
+            background: rgba(30, 30, 60, 0.7);
             border: 1px solid #6a00ff;
             color: white;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 16px;
         }
         button {
             background: linear-gradient(45deg, #6a00ff, #ff00aa);
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 14px 25px;
             border-radius: 50px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 16px;
             display: block;
-            margin: 20px auto;
-            width: 200px;
+            margin: 30px auto;
+            width: 80%;
+            transition: all 0.3s;
         }
-        #confirmation {
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(106, 0, 255, 0.6);
+        }
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        #status {
             text-align: center;
             margin-top: 20px;
+            min-height: 24px;
+        }
+        .success {
             color: #00ff88;
-            display: none;
+        }
+        .error {
+            color: #ff5555;
         }
     </style>
 </head>
 <body>
-    <h1>DARKSIDE Admin Panel</h1>
+    <h1><i class="fas fa-lock"></i> DARKSIDE Admin</h1>
     
     <div class="form-group">
-        <label for="appName">App Name:</label>
-        <input type="text" id="appName" placeholder="e.g. PUBG Mobile">
-    </div>
-    
-    <div class="form-group">
-        <label for="appVersion">Version:</label>
-        <input type="text" id="appVersion" placeholder="e.g. 3.9.3">
+        <label for="appName"><i class="fas fa-mobile-alt"></i> App Name:</label>
+        <input type="text" id="appName" placeholder="e.g. PUBG Mobile" required>
     </div>
     
     <div class="form-group">
-        <label for="downloadLink">Download Link:</label>
-        <input type="url" id="downloadLink" placeholder="https://example.com/file.apk">
+        <label for="appVersion"><i class="fas fa-code-branch"></i> Version:</label>
+        <input type="text" id="appVersion" placeholder="e.g. 3.9.3" required>
     </div>
     
-    <button id="addBtn"><i class="fas fa-plus-circle"></i> Add Download</button>
-    
-    <div id="confirmation">
-        <i class="fas fa-check-circle"></i> Added successfully!
+    <div class="form-group">
+        <label for="downloadLink"><i class="fas fa-link"></i> Download Link:</label>
+        <input type="url" id="downloadLink" placeholder="https://example.com/file.apk" required>
     </div>
+    
+    <button id="addBtn">
+        <i class="fas fa-plus-circle"></i> Add Download
+    </button>
+    
+    <div id="status"></div>
 
     <script>
-document.getElementById('addBtn').addEventListener('click', async function() {
-    const appName = document.getElementById('appName').value;
-    const appVersion = document.getElementById('appVersion').value;
-    const downloadLink = document.getElementById('downloadLink').value;
-    
-    if (!appName || !appVersion || !downloadLink) {
-        alert("Please fill all fields!");
-        return;
-    }
+        document.getElementById('addBtn').addEventListener('click', async () => {
+            const appName = document.getElementById('appName').value.trim();
+            const appVersion = document.getElementById('appVersion').value.trim();
+            const downloadLink = document.getElementById('downloadLink').value.trim();
+            const statusEl = document.getElementById('status');
+            const btn = document.getElementById('addBtn');
+            
+            if (!appName || !appVersion || !downloadLink) {
+                showStatus('Please fill all fields!', 'error');
+                return;
+            }
 
-    // Show loading state
-    const btn = this;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    btn.disabled = true;
+            // Disable button during request
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            showStatus('Updating...', '');
 
-    try {
-        // Call Netlify Function to update GitHub
-        const response = await fetch('/.netlify/functions/update-downloads', { ... })
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                appName,
-                appVersion,
-                downloadLink
-            })
+            try {
+                const response = await fetch('/.netlify/functions/update-downloads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ appName, appVersion, downloadLink })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showStatus('Success! Site will update in ~30 seconds.', 'success');
+                    // Clear form
+                    document.getElementById('appName').value = '';
+                    document.getElementById('appVersion').value = '';
+                    document.getElementById('downloadLink').value = '';
+                } else {
+                    throw new Error(result.error || 'Failed to save');
+                }
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+                console.error('API Error:', error);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Download';
+                btn.disabled = false;
+            }
         });
 
-        const result = await response.json();
-        
-        if (response.ok) {
-            alert('Success! Site will update in ~30 seconds.');
-            location.reload(); // Refresh to clear form
-        } else {
-            throw new Error(result.error || 'Failed to save');
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = type; // 'success' or 'error'
         }
-    } catch (error) {
-        alert('Error: ' + error.message);
-    } finally {
-        btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Download';
-        btn.disabled = false;
-    }
-});
-</script>
+    </script>
 </body>
 </html>
