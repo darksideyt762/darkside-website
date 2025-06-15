@@ -1,4 +1,5 @@
-const fetch = require('node-fetch');
+const { fetch } = require('@netlify/functions');  // Modern way
+// Instead of: const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     // 1. Check if it's a POST request
