@@ -102,7 +102,7 @@ document.getElementById('addBtn').addEventListener('click', async function() {
 
     try {
         // Call Netlify Function to update GitHub
-        const response = await fetch('/.netlify/functions/update-downloads', {
+        const response = await fetch('/.netlify/functions/update-downloads', { ... })
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
