@@ -315,6 +315,49 @@ footer {
     visibility: visible;
 }
 
+/* Telegram Widget Styling */
+.telegram-updates {
+  background: rgba(20, 20, 40, 0.7);
+  border-radius: 15px;
+  padding: 25px;
+  margin: 40px 0;
+  border-left: 3px solid #0088cc;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.telegram-updates h2 {
+  color: #0088cc;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#telegram-widget {
+  margin: 20px 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.telegram-join-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0088cc;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.telegram-join-btn:hover {
+  background: #006699;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4);
+}
+
 /* Animations */
 .fade-in {
     animation: fadeIn 0.8s ease-out;

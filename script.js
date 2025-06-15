@@ -47,6 +47,22 @@ document.addEventListener('DOMContentLoaded', function() {
       .catch(err => console.log('Download check error:', err));
   }
 
+// Load Telegram Widget
+function loadTelegramWidget() {
+  const script = document.createElement('script');
+  script.src = 'https://telegram.org/js/telegram-widget.js?22';
+  script.async = true;
+  script.setAttribute('data-telegram-discussion', 'DARKSIDE_762'); // Your channel
+  script.setAttribute('data-comments-limit', '5'); // Show 5 messages
+  script.setAttribute('data-colorful', '1'); // Colorful mode
+  script.setAttribute('data-height', '400'); // Widget height
+  script.setAttribute('data-dark', '1'); // Dark mode
+  document.getElementById('telegram-widget').appendChild(script);
+}
+
+// Call when page loads
+document.addEventListener('DOMContentLoaded', loadTelegramWidget);
+
   // Show notification
   function showNewDownloadAlert(count) {
     alertMessage.textContent = `${count} new ${count > 1 ? 'downloads' : 'download'} available!`;
