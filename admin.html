@@ -104,47 +104,36 @@
 
     <script>
         document.getElementById('addBtn').addEventListener('click', async () => {
-            const appName = document.getElementById('appName').value.trim();
-            const appVersion = document.getElementById('appVersion').value.trim();
-            const downloadLink = document.getElementById('downloadLink').value.trim();
-            const statusEl = document.getElementById('status');
-            const btn = document.getElementById('addBtn');
+          const btn = document.getElementById('addBtn');
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        
+          try {
+            const response = await fetch('/.netlify/functions/update-downloads', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                appName: document.getElementById('appName').value,
+                appVersion: document.getElementById('appVersion').value,
+                downloadLink: document.getElementById('downloadLink').value
+              })
+            });
+        
+            const result = await response.json(); // This will now work!
             
-            if (!appName || !appVersion || !downloadLink) {
-                showStatus('Please fill all fields!', 'error');
-                return;
+            if (response.ok) {
+              alert('Success! Site will update shortly.');
+              location.reload();
+            } else {
+              throw new Error(result.error || 'Unknown error');
             }
-
-            // Disable button during request
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-            showStatus('Updating...', '');
-
-            try {
-                const response = await fetch('/.netlify/functions/update-downloads', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ appName, appVersion, downloadLink })
-                });
-
-                const result = await response.json();
-                
-                if (response.ok) {
-                    showStatus('Success! Site will update in ~30 seconds.', 'success');
-                    // Clear form
-                    document.getElementById('appName').value = '';
-                    document.getElementById('appVersion').value = '';
-                    document.getElementById('downloadLink').value = '';
-                } else {
-                    throw new Error(result.error || 'Failed to save');
-                }
-            } catch (error) {
-                showStatus('Error: ' + error.message, 'error');
-                console.error('API Error:', error);
-            } finally {
-                btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Download';
-                btn.disabled = false;
-            }
+          } catch (error) {
+            alert('Error: ' + error.message);
+            console.error('Details:', error);
+          } finally {
+            btn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Download';
+            btn.disabled = false;
+          }
         });
 
         function showStatus(message, type) {
