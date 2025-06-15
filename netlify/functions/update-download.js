@@ -1,21 +1,44 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-    // 1. Extract data from admin panel
-    const { appName, appVersion, downloadLink } = JSON.parse(event.body);
+    // 1. Check if it's a POST request
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ error: 'Method Not Allowed' })
+        };
+    }
+
+    // 2. Parse JSON body
+    let data;
+    try {
+        data = JSON.parse(event.body);
+    } catch (err) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: 'Invalid JSON body' })
+        };
+    }
+
+    const { appName, appVersion, downloadLink } = data;
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-    const REPO = "darkside762/darkside-website"; // ← Change this!
+    const REPO = "darksideyt762/darkside-website"; // Your repo
 
     try {
-        // 2. Fetch current downloads.html from GitHub
+        // 3. Fetch current downloads.html
         const fileResponse = await fetch(
             `https://api.github.com/repos/${REPO}/contents/downloads.html`,
-            { headers: { Authorization: `token ${GITHUB_TOKEN}` } }
-        );
+            { headers: { Authorization: `token ${GITHUB_TOKEN}` }
+        });
+
+        if (!fileResponse.ok) {
+            throw new Error(`GitHub API error: ${fileResponse.statusText}`);
+        }
+
         const fileData = await fileResponse.json();
         const currentContent = Buffer.from(fileData.content, 'base64').toString('utf8');
 
-        // 3. Generate new download entry
+        // 4. Generate new HTML entry
         const newEntry = `
 <div class="update-item">
     <h3>${appName}</h3>
@@ -25,14 +48,14 @@ exports.handler = async (event) => {
     </a>
 </div>`;
 
-        // 4. Insert between AUTO-GENERATED markers
+        // 5. Update content between markers
         const updatedContent = currentContent.replace(
             /<!-- AUTO-GENERATED CONTENT START -->[\s\S]*<!-- AUTO-GENERATED CONTENT END -->/,
             `<!-- AUTO-GENERATED CONTENT START -->\n${newEntry}\n<!-- AUTO-GENERATED CONTENT END -->`
         );
 
-        // 5. Push changes back to GitHub
-        await fetch(
+        // 6. Push changes to GitHub
+        const updateResponse = await fetch(
             `https://api.github.com/repos/${REPO}/contents/downloads.html`,
             {
                 method: 'PUT',
@@ -40,13 +63,23 @@ exports.handler = async (event) => {
                 body: JSON.stringify({
                     message: `Added ${appName} via admin panel`,
                     content: Buffer.from(updatedContent).toString('base64'),
-                    sha: fileData.sha  // Required to update existing files
+                    sha: fileData.sha
                 })
             }
         );
 
-        return { statusCode: 200, body: JSON.stringify({ success: true }) };
+        if (!updateResponse.ok) {
+            throw new Error(`GitHub update failed: ${updateResponse.statusText}`);
+        }
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ success: true })
+        };
     } catch (error) {
-        return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: error.message })
+        };
     }
 };
