@@ -6,6 +6,61 @@
     --accent: #00ffff;
 }
 
+/* Download Alert */
+.download-alert {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #6a00ff, #ff00aa);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  z-index: 1000;
+  transform: translateX(150%);
+  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  max-width: 300px;
+}
+
+.download-alert.show {
+  transform: translateX(0);
+}
+
+.alert-content {
+  position: relative;
+}
+
+.alert-close {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #0a0a1a;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.alert-btn {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  margin-top: 10px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.alert-btn:hover {
+  background: rgba(255,255,255,0.3);
+  transform: translateX(5px);
+}
+
 * {
     margin: 0;
     padding: 0;
