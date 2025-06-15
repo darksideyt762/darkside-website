@@ -1,0 +1,124 @@
+<script>
+    const password = prompt("Enter Admin Password:");
+    if (password !== "bambukeu") {
+        window.location = "/";
+    }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARKSIDE Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a1a;
+            color: white;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #6a00ff;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #00ffff;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(30, 30, 60, 0.5);
+            border: 1px solid #6a00ff;
+            color: white;
+            border-radius: 5px;
+        }
+        button {
+            background: linear-gradient(45deg, #6a00ff, #ff00aa);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            display: block;
+            margin: 20px auto;
+            width: 200px;
+        }
+        #confirmation {
+            text-align: center;
+            margin-top: 20px;
+            color: #00ff88;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>DARKSIDE Admin Panel</h1>
+    
+    <div class="form-group">
+        <label for="appName">App Name:</label>
+        <input type="text" id="appName" placeholder="e.g. PUBG Mobile">
+    </div>
+    
+    <div class="form-group">
+        <label for="appVersion">Version:</label>
+        <input type="text" id="appVersion" placeholder="e.g. 3.9.3">
+    </div>
+    
+    <div class="form-group">
+        <label for="downloadLink">Download Link:</label>
+        <input type="url" id="downloadLink" placeholder="https://example.com/file.apk">
+    </div>
+    
+    <button id="addBtn"><i class="fas fa-plus-circle"></i> Add Download</button>
+    
+    <div id="confirmation">
+        <i class="fas fa-check-circle"></i> Added successfully!
+    </div>
+
+    <script>
+        document.getElementById('addBtn').addEventListener('click', function() {
+            const appName = document.getElementById('appName').value;
+            const appVersion = document.getElementById('appVersion').value;
+            const downloadLink = document.getElementById('downloadLink').value;
+            
+            if (!appName || !appVersion || !downloadLink) {
+                alert("Please fill all fields!");
+                return;
+            }
+            
+            // Format the new download entry
+            const newEntry = `
+<div class="update-item">
+    <h3>${appName}</h3>
+    <p>Version: ${appVersion}</p>
+    <a href="${downloadLink}" class="download-btn">
+        <i class="fas fa-download"></i> Download
+    </a>
+</div>
+            `;
+            
+            // Show confirmation
+            const confirmation = document.getElementById('confirmation');
+            confirmation.style.display = 'block';
+            setTimeout(() => confirmation.style.display = 'none', 2000);
+            
+            // Clear form
+            document.getElementById('appName').value = '';
+            document.getElementById('appVersion').value = '';
+            document.getElementById('downloadLink').value = '';
+            
+            // In a real implementation, you would send this to a server
+            alert("In a real setup, this would save to your website.\nFor now, copy this HTML and add it to downloads.html:\n\n" + newEntry);
+        });
+    </script>
+</body>
+</html>
