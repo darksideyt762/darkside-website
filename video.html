@@ -17,11 +17,11 @@
     html, body {
       width:100%; height:100%; overflow:hidden;
       font-family:"Poppins",Arial,sans-serif;
-      background:#000; color:#fff; position:relative;
+      background:#0a192f; color:#e3f2fd; position:relative;
     }
     #overlay {
       position:absolute; top:0; left:0; width:100%; height:100%;
-      backdrop-filter:blur(20px); background:rgba(0,0,0,0.6);
+      backdrop-filter:blur(20px); background:rgba(10, 25, 47, 0.8);
       opacity:0; transition:opacity .5s;
       pointer-events:none; z-index:1; display:none;
     }
@@ -33,75 +33,88 @@
     }
     .spinner {
       width:60px; height:60px;
-      border:6px solid rgba(255,255,255,0.2);
-      border-top:6px solid #FF0000;
+      border:6px solid rgba(66, 165, 245, 0.2);
+      border-top:6px solid #1e88e5;
       border-radius:50%;
       animation:spin 1s linear infinite;
       margin-bottom:1rem;
     }
     @keyframes spin { to{ transform:rotate(360deg); } }
     .loading-text {
-      font-size:1.1rem; font-weight:300; color:#eee;
+      font-size:1.1rem; font-weight:300; color:#bbdefb;
       text-align:center; max-width:80%;
     }
     #videoCard, #errorCard {
       position:absolute; top:50%; left:50%;
       transform:translate(-50%,-50%);
       width:90%; max-width:380px;
-      background:rgba(0,0,0,0.7);
+      background:rgba(10, 25, 47, 0.9);
       border-radius:12px;
-      box-shadow:0 8px 24px rgba(0,0,0,0.6);
+      box-shadow:0 8px 24px rgba(13, 71, 161, 0.6);
       overflow:hidden; text-align:center;
       padding:1.5rem 1rem;
       opacity:0; transition:opacity .5s;
       z-index:2; display:none;
+      border: 1px solid rgba(66, 165, 245, 0.3);
     }
     #videoCard.show, #errorCard.show { display:block; opacity:1; }
     #videoThumb {
       width:100%; border-radius:8px;
       margin-bottom:1rem; transition:transform .3s;
       cursor:pointer;
+      border: 1px solid rgba(66, 165, 245, 0.3);
     }
     #videoThumb:hover { transform:scale(1.05); }
     #videoTitle, #errorCard h1 {
       font-size:1.25rem; font-weight:600;
       margin-bottom:.5rem; line-height:1.4;
     }
-    #errorCard h1 { color:#E74C3C; }
+    #errorCard h1 { color:#e53935; }
     .channel-name {
-      font-size:.9rem; font-weight:300; color:#ccc;
+      font-size:.9rem; font-weight:300; color:#90caf9;
       margin-bottom:1rem;
     }
     .progress-container {
       width:100%; height:6px;
-      background:rgba(255,255,255,0.2);
+      background:rgba(66, 165, 245, 0.2);
       border-radius:3px; overflow:hidden; margin-bottom:1rem;
     }
     #progressBar {
       width:0%; height:100%;
-      background:linear-gradient(90deg,#FF0000,#CC0000);
+      background:linear-gradient(90deg, #1e88e5, #0d47a1);
       border-radius:3px; transition:width 1s linear;
     }
     .countdown, #errorCard p {
-      font-size:.95rem; font-weight:300; color:#fff;
+      font-size:.95rem; font-weight:300; color:#bbdefb;
       margin-bottom:1rem; line-height:1.4;
     }
     .btn {
       display:inline-block; padding:.7rem 1.4rem;
-      background:#FF0000; color:#fff; text-decoration:none;
+      background:linear-gradient(45deg, #1e88e5, #0d47a1);
+      color:#fff; text-decoration:none;
       font-size:.95rem; font-weight:600; border-radius:6px;
-      box-shadow:0 4px 12px rgba(0,0,0,0.4);
-      transition:background .2s,transform .1s;
+      box-shadow:0 4px 12px rgba(13, 71, 161, 0.4);
+      transition:all .2s ease;
+      border: none;
     }
-    .btn:hover { background:#E60000; transform:translateY(-2px); }
+    .btn:hover { 
+      background:linear-gradient(45deg, #0d47a1, #1e88e5);
+      transform:translateY(-2px);
+      box-shadow:0 6px 16px rgba(13, 71, 161, 0.5);
+    }
     #noJsMessage {
       display:none; position:absolute; top:50%; left:50%;
       transform:translate(-50%,-50%);
-      background:rgba(0,0,0,0.8); padding:1rem 1.5rem;
+      background:rgba(10, 25, 47, 0.9); padding:1rem 1.5rem;
       border-radius:8px; text-align:center; z-index:3; max-width:90%;
+      border: 1px solid rgba(66, 165, 245, 0.3);
     }
     noscript #noJsMessage { display:block; }
-    #noJsMessage a { color:#FF0000; text-decoration:underline; }
+    #noJsMessage a { 
+      color:#42a5f5; 
+      text-decoration:underline;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -127,13 +140,13 @@
 <div id="errorCard" aria-live="assertive" aria-hidden="true">
   <h1>Oops!</h1>
   <p>We got an unexpected issue.<br/>Please check our channel directly for new videos.</p>
-  <a href="https://youtube.com/@DarkSideGaming-762" class="btn" target="_blank" rel="noopener">Visit Channel</a>
+  <a href="https://www.youtube.com/@DarkSideGaming-762" class="btn" target="_blank" rel="noopener">Visit Channel</a>
 </div>
 
 <noscript>
   <div id="noJsMessage">
     JavaScript is required to auto-redirect.<br/>
-    <a href="https://youtube.com/@DarkSideGaming-762" target="_blank" rel="noopener">
+    <a href="https://www.youtube.com/@DarkSideGaming-762" target="_blank" rel="noopener">
       Click here to view all videos
     </a>
   </div>
@@ -141,7 +154,7 @@
 
 <script>
 (function(){
-  const REDIRECT_DELAY = 2;
+  const REDIRECT_DELAY = 3; // Changed from 2 to 3 seconds for better UX
 
   const overlayEl   = document.getElementById("overlay");
   const loadingEl   = document.getElementById("loadingContainer");
@@ -156,69 +169,109 @@
 
   let latestVideoId = "", timerInterval = null;
 
-  window.redirectToAppOrWeb = () => {
+  function clearTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+  window.redirectToAppOrWeb = function() {
+    clearTimer();
     if (!latestVideoId) return;
-    const intentUri = `intent://www.youtube.com/watch?v=${latestVideoId}` +
-      `#Intent;scheme=https;package=com.google.android.youtube;action=android.intent.action.VIEW;` +
-      `category=android.intent.category.BROWSABLE;` +
-      `S.browser_fallback_url=${encodeURIComponent("market://details?id=com.google.android.youtube")};end`;
-    const iosUri = `youtube://www.youtube.com/watch?v=${latestVideoId}`;
-    const ua = navigator.userAgent || "";
-    if (/Android.*Chrome/i.test(ua)) location.href = intentUri;
-    else if (/Android/i.test(ua)) location.href = "market://details?id=com.google.android.youtube";
-    else if (/iPhone|iPad|iPod/i.test(ua)) location.href = iosUri;
+    try {
+      const intentUri = `intent://www.youtube.com/watch?v=${latestVideoId}` +
+        `#Intent;scheme=https;package=com.google.android.youtube;action=android.intent.action.VIEW;` +
+        `category=android.intent.category.BROWSABLE;` +
+        `S.browser_fallback_url=${encodeURIComponent("market://details?id=com.google.android.youtube")};end`;
+      const iosUri = `youtube://www.youtube.com/watch?v=${latestVideoId}`;
+      const ua = navigator.userAgent || "";
+      
+      if (/Android.*Chrome/i.test(ua)) {
+        window.location.href = intentUri;
+      } else if (/Android/i.test(ua)) {
+        window.location.href = "market://details?id=com.google.android.youtube";
+      } else if (/iPhone|iPad|iPod/i.test(ua)) {
+        window.location.href = iosUri;
+      } else {
+        // Fallback for desktop or unsupported devices
+        window.location.href = `https://www.youtube.com/watch?v=${latestVideoId}`;
+      }
+    } catch (e) {
+      console.error("Redirect error:", e);
+      window.location.href = `https://www.youtube.com/watch?v=${latestVideoId}`;
+    }
   };
 
   async function fetchLatestVideo() {
-    const res = await fetch("get_latest_video.php");
-    if (!res.ok) throw new Error("Server error: " + res.status);
-    return await res.json();
+    try {
+      const res = await fetch("get_latest_video.php");
+      if (!res.ok) throw new Error("Server error: " + res.status);
+      return await res.json();
+    } catch (error) {
+      console.error("Fetch error:", error);
+      throw error;
+    }
   }
 
   async function saveCache(info) {
-    const res = await fetch("?action=savecache", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(info)
-    });
-    if (!res.ok) {
-      console.warn("Failed to save cache");
+    try {
+      const res = await fetch("?action=savecache", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(info)
+      });
+      if (!res.ok) {
+        console.warn("Failed to save cache");
+      }
+    } catch (error) {
+      console.error("Cache save error:", error);
     }
   }
 
   async function loadCache() {
-    const res = await fetch("?action=getcache");
-    if (!res.ok) throw new Error("No cache available");
-    return await res.json();
+    try {
+      const res = await fetch("?action=getcache");
+      if (!res.ok) throw new Error("No cache available");
+      return await res.json();
+    } catch (error) {
+      console.error("Cache load error:", error);
+      throw error;
+    }
   }
 
   async function getInfo() {
     try {
       return await loadCache();
     } catch {
-      const info = await fetchLatestVideo();
-      await saveCache(info);
-      return info;
+      try {
+        const info = await fetchLatestVideo();
+        await saveCache(info);
+        return info;
+      } catch (error) {
+        console.error("Failed to get video info:", error);
+        throw error;
+      }
     }
   }
 
   (async function init() {
     try {
-      loadingEl.style.display = "";
+      loadingEl.style.display = "flex";
       const info = await getInfo();
 
-      latestVideoId = info.vidId;
-      titleEl.textContent = info.title;
-      channelEl.textContent = info.channelTitle;
-      thumbEl.src = info.thumbUrl;
-      thumbEl.alt = `Thumbnail for “${info.title}”`;
+      latestVideoId = info.vidId || "";
+      titleEl.textContent = info.title || "Latest Video";
+      channelEl.textContent = info.channelTitle || "DarkSide Gaming";
+      thumbEl.src = info.thumbUrl || "";
+      thumbEl.alt = info.title ? `Thumbnail for "${info.title}"` : "Video thumbnail";
 
       loadingEl.style.display = "none";
-      document.body.style.backgroundImage = `url("${info.thumbUrl}")`;
+      document.body.style.backgroundImage = info.thumbUrl ? `url("${info.thumbUrl}")` : "";
       document.body.style.backgroundSize = "cover";
       document.body.style.backgroundPosition = "center";
       overlayEl.style.display = "block";
-      requestAnimationFrame(() => overlayEl.style.opacity = "1");
+      setTimeout(() => overlayEl.style.opacity = "1", 10);
       videoCardEl.classList.add("show");
 
       let rem = REDIRECT_DELAY, pct = 0;
@@ -232,7 +285,7 @@
           progressEl.style.width = `${Math.min(pct, 100)}%`;
         }
         if (rem < 0) {
-          clearInterval(timerInterval);
+          clearTimer();
           redirectToAppOrWeb();
         }
       }, 1000);
@@ -242,14 +295,17 @@
         redirectToAppOrWeb();
       });
       thumbEl.addEventListener("keydown", e => {
-        if (e.key === "Enter" || e.key === " ") redirectToAppOrWeb();
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          redirectToAppOrWeb();
+        }
       });
 
     } catch (err) {
-      console.error(err);
+      console.error("Initialization error:", err);
       loadingEl.style.display = "none";
       overlayEl.style.display = "block";
-      requestAnimationFrame(() => overlayEl.style.opacity = "1");
+      setTimeout(() => overlayEl.style.opacity = "1", 10);
       errorCardEl.classList.add("show");
     }
   })();
