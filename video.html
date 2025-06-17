@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Redirecting to Latest Video…</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Q4TPMV8LFE"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-Q4TPMV8LFE');
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body {
+      width:100%; height:100%; overflow:hidden;
+      font-family:"Poppins",Arial,sans-serif;
+      background:#000; color:#fff; position:relative;
+    }
+    #overlay {
+      position:absolute; top:0; left:0; width:100%; height:100%;
+      backdrop-filter:blur(20px); background:rgba(0,0,0,0.6);
+      opacity:0; transition:opacity .5s;
+      pointer-events:none; z-index:1; display:none;
+    }
+    .loading-container {
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      display:flex; flex-direction:column; align-items:center;
+      z-index:2;
+    }
+    .spinner {
+      width:60px; height:60px;
+      border:6px solid rgba(255,255,255,0.2);
+      border-top:6px solid #FF0000;
+      border-radius:50%;
+      animation:spin 1s linear infinite;
+      margin-bottom:1rem;
+    }
+    @keyframes spin { to{ transform:rotate(360deg); } }
+    .loading-text {
+      font-size:1.1rem; font-weight:300; color:#eee;
+      text-align:center; max-width:80%;
+    }
+    #videoCard, #errorCard {
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      width:90%; max-width:380px;
+      background:rgba(0,0,0,0.7);
+      border-radius:12px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.6);
+      overflow:hidden; text-align:center;
+      padding:1.5rem 1rem;
+      opacity:0; transition:opacity .5s;
+      z-index:2; display:none;
+    }
+    #videoCard.show, #errorCard.show { display:block; opacity:1; }
+    #videoThumb {
+      width:100%; border-radius:8px;
+      margin-bottom:1rem; transition:transform .3s;
+      cursor:pointer;
+    }
+    #videoThumb:hover { transform:scale(1.05); }
+    #videoTitle, #errorCard h1 {
+      font-size:1.25rem; font-weight:600;
+      margin-bottom:.5rem; line-height:1.4;
+    }
+    #errorCard h1 { color:#E74C3C; }
+    .channel-name {
+      font-size:.9rem; font-weight:300; color:#ccc;
+      margin-bottom:1rem;
+    }
+    .progress-container {
+      width:100%; height:6px;
+      background:rgba(255,255,255,0.2);
+      border-radius:3px; overflow:hidden; margin-bottom:1rem;
+    }
+    #progressBar {
+      width:0%; height:100%;
+      background:linear-gradient(90deg,#FF0000,#CC0000);
+      border-radius:3px; transition:width 1s linear;
+    }
+    .countdown, #errorCard p {
+      font-size:.95rem; font-weight:300; color:#fff;
+      margin-bottom:1rem; line-height:1.4;
+    }
+    .btn {
+      display:inline-block; padding:.7rem 1.4rem;
+      background:#FF0000; color:#fff; text-decoration:none;
+      font-size:.95rem; font-weight:600; border-radius:6px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.4);
+      transition:background .2s,transform .1s;
+    }
+    .btn:hover { background:#E60000; transform:translateY(-2px); }
+    #noJsMessage {
+      display:none; position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      background:rgba(0,0,0,0.8); padding:1rem 1.5rem;
+      border-radius:8px; text-align:center; z-index:3; max-width:90%;
+    }
+    noscript #noJsMessage { display:block; }
+    #noJsMessage a { color:#FF0000; text-decoration:underline; }
+  </style>
+</head>
+<body>
+
+<div id="overlay"></div>
+<div class="loading-container" id="loadingContainer">
+  <div class="spinner" aria-hidden="true"></div>
+  <div class="loading-text" role="status">Loading latest video…</div>
+</div>
+
+<div id="videoCard" aria-live="polite" aria-hidden="true">
+  <img id="videoThumb" src="" alt="Latest Video Thumbnail"
+       tabindex="0" role="button"
+       aria-label="Click to watch the latest video immediately"
+       onclick="redirectToAppOrWeb()" />
+  <h1 id="videoTitle">Video Title</h1>
+  <p class="channel-name" id="channelName">Channel Name</p>
+  <div class="progress-container"><div id="progressBar"></div></div>
+  <p class="countdown">Redirecting in <span id="countdownSeconds">3</span>s…</p>
+  <a href="#" class="btn" id="manualLink" role="button">Watch Now</a>
+</div>
+
+<div id="errorCard" aria-live="assertive" aria-hidden="true">
+  <h1>Oops!</h1>
+  <p>We got an unexpected issue.<br/>Please check our channel directly for new videos.</p>
+  <a href="https://www.youtube.com/@DarkSideGaming-762" class="btn" target="_blank" rel="noopener">Visit Channel</a>
+</div>
+
+<noscript>
+  <div id="noJsMessage">
+    JavaScript is required to auto-redirect.<br/>
+    <a href="https://www.youtube.com/@DarkSideGaming-762" target="_blank" rel="noopener">
+      Click here to view all videos
+    </a>
+  </div>
+</noscript>
+
+<script>
+(function(){
+  const REDIRECT_DELAY = 2;
+
+  const overlayEl   = document.getElementById("overlay");
+  const loadingEl   = document.getElementById("loadingContainer");
+  const videoCardEl = document.getElementById("videoCard");
+  const errorCardEl = document.getElementById("errorCard");
+  const thumbEl     = document.getElementById("videoThumb");
+  const titleEl     = document.getElementById("videoTitle");
+  const channelEl   = document.getElementById("channelName");
+  const progressEl  = document.getElementById("progressBar");
+  const countdownEl = document.getElementById("countdownSeconds");
+  const manualBtn   = document.getElementById("manualLink");
+
+  let latestVideoId = "", timerInterval = null;
+
+  window.redirectToAppOrWeb = () => {
+    if (!latestVideoId) return;
+    const intentUri = `intent://www.youtube.com/watch?v=${latestVideoId}` +
+      `#Intent;scheme=https;package=com.google.android.youtube;action=android.intent.action.VIEW;` +
+      `category=android.intent.category.BROWSABLE;` +
+      `S.browser_fallback_url=${encodeURIComponent("market://details?id=com.google.android.youtube")};end`;
+    const iosUri = `youtube://www.youtube.com/watch?v=${latestVideoId}`;
+    const ua = navigator.userAgent || "";
+    if (/Android.*Chrome/i.test(ua)) location.href = intentUri;
+    else if (/Android/i.test(ua)) location.href = "market://details?id=com.google.android.youtube";
+    else if (/iPhone|iPad|iPod/i.test(ua)) location.href = iosUri;
+  };
+
+  async function fetchLatestVideo() {
+    const res = await fetch("get_latest_video.php");
+    if (!res.ok) throw new Error("Server error: " + res.status);
+    return await res.json();
+  }
+
+  async function saveCache(info) {
+    const res = await fetch("?action=savecache", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(info)
+    });
+    if (!res.ok) {
+      console.warn("Failed to save cache");
+    }
+  }
+
+  async function loadCache() {
+    const res = await fetch("?action=getcache");
+    if (!res.ok) throw new Error("No cache available");
+    return await res.json();
+  }
+
+  async function getInfo() {
+    try {
+      return await loadCache();
+    } catch {
+      const info = await fetchLatestVideo();
+      await saveCache(info);
+      return info;
+    }
+  }
+
+  (async function init() {
+    try {
+      loadingEl.style.display = "";
+      const info = await getInfo();
+
+      latestVideoId = info.vidId;
+      titleEl.textContent = info.title;
+      channelEl.textContent = info.channelTitle;
+      thumbEl.src = info.thumbUrl;
+      thumbEl.alt = `Thumbnail for “${info.title}”`;
+
+      loadingEl.style.display = "none";
+      document.body.style.backgroundImage = `url("${info.thumbUrl}")`;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center";
+      overlayEl.style.display = "block";
+      requestAnimationFrame(() => overlayEl.style.opacity = "1");
+      videoCardEl.classList.add("show");
+
+      let rem = REDIRECT_DELAY, pct = 0;
+      countdownEl.textContent = rem;
+      const step = 100 / REDIRECT_DELAY;
+      timerInterval = setInterval(() => {
+        rem--;
+        if (rem >= 0) {
+          countdownEl.textContent = rem;
+          pct += step;
+          progressEl.style.width = `${Math.min(pct, 100)}%`;
+        }
+        if (rem < 0) {
+          clearInterval(timerInterval);
+          redirectToAppOrWeb();
+        }
+      }, 1000);
+
+      manualBtn.addEventListener("click", e => {
+        e.preventDefault();
+        redirectToAppOrWeb();
+      });
+      thumbEl.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") redirectToAppOrWeb();
+      });
+
+    } catch (err) {
+      console.error(err);
+      loadingEl.style.display = "none";
+      overlayEl.style.display = "block";
+      requestAnimationFrame(() => overlayEl.style.opacity = "1");
+      errorCardEl.classList.add("show");
+    }
+  })();
+})();
+</script>
+</body>
+</html>
